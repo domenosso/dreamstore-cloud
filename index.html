@@ -6,7 +6,7 @@
     <title>DreamStore</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         /* Общие стили и сброс */
@@ -25,22 +25,22 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
 
-        /* Контейнер приложения (имитация мобильного экрана как на рефе) */
+        /* Контейнер приложения (адаптивный под мобилки) */
         .store-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background-color: #0f0f0f;
-            min-height: 840px;
+            min-height: calc(100vh - 32px);
             border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             border: 1px solid #1a1a1a;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
         /* Заголовок стора */
@@ -49,7 +49,7 @@
             font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            margin-top: 8px;
+            margin-top: 4px;
             animation: fadeInDown 0.6s ease;
         }
 
@@ -61,12 +61,11 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             animation: scaleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
         }
 
         .promo-banner:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 28px rgba(81, 74, 197, 0.2);
+            transform: scale(1.01);
+            box-shadow: 0 12px 28px rgba(81, 74, 197, 0.15);
         }
 
         .promo-banner img {
@@ -79,7 +78,7 @@
         .games-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         /* Карточка игры */
@@ -101,88 +100,162 @@
             border-color: #2a2a2a;
         }
 
-        /* Левая часть карточки (Иконка + Название) */
+        /* Инфо об игре */
         .game-info {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
+            flex: 1;
+            min-width: 0; /* Чтобы длинный текст корректно обрезался */
         }
 
         .game-icon {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: 12px;
             object-fit: cover;
-            background-color: #2a2a2a; /* Фолбек, если иконка не загрузится */
+            background-color: #2a2a2a;
+            flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .game-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #ffffff;
-            max-width: 160px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Кнопка "Установить" */
-        .download-btn {
+        /* Кнопки интерфейса */
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #4045b2; /* Насыщенный сине-фиолетовый цвет с рефа */
+            background: #4045b2;
             color: #ffffff;
             text-decoration: none;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
+            border: none;
+            cursor: pointer;
             transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            text-align: center;
         }
 
-        .download-btn:hover {
+        .btn:hover {
             background: #4f55d6;
             box-shadow: 0 4px 12px rgba(79, 85, 214, 0.3);
         }
 
-        .download-btn:active {
+        .btn:active {
             transform: scale(0.96);
         }
 
-        /* Анимации */
+        /* Кнопка "Больше не показывать" (второстепенная) */
+        .btn-secondary {
+            background: #222224;
+            color: #aaaaaa;
+        }
+
+        .btn-secondary:hover {
+            background: #2d2d30;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Стили Модального Окна (Инструкции) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-window {
+            background-color: #141414;
+            border: 1px solid #262626;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .modal-overlay.active .modal-window {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .modal-steps {
+            font-size: 14px;
+            color: #b3b3b3;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-step {
+            background: #1c1c1e;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border-left: 3px solid #4045b2;
+        }
+
+        .modal-step strong {
+            color: #ffffff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        /* Анимации загрузки */
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes scaleUp {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
-
         @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -192,7 +265,7 @@
         <h1 class="store-header">DreamStore</h1>
 
         <div class="promo-banner">
-            <img src="banner.png" alt="Встречайте DreamStore! Все приложения команды в одном месте">
+            <img src="banner.png" alt="Встречайте DreamStore!">
         </div>
 
         <div class="games-list" id="games-container">
@@ -200,39 +273,52 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="instruction-modal">
+        <div class="modal-window">
+            <div class="modal-title">Как установить приложение?</div>
+            
+            <div class="modal-steps">
+                <div class="modal-step">1. Нажмите на кнопку <strong>"Перейти по ссылке"</strong> ниже.</div>
+                <div class="modal-step">2. На открывшейся странице GitHub нажмите кнопку <strong>"Скачать всё"</strong> (или Download).</div>
+            </div>
+
+            <div class="modal-buttons">
+                <a href="#" target="_blank" class="btn" id="modal-go-link">Перейти по ссылке</a>
+                <button class="btn btn-secondary" id="modal-skip-btn">Больше не показывать</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Функция для загрузки данных из games.json
+        // Переменная для хранения текущей ссылки на билд
+        let currentGameUrl = "";
+
         async function loadGames() {
             const container = document.getElementById('games-container');
             
             try {
                 const response = await fetch('games.json');
-                if (!response.ok) {
-                    throw new Error('Не удалось загрузить список игр');
-                }
+                if (!response.ok) throw new Error('Ошибка загрузки JSON');
                 
                 const games = await response.json();
-                container.innerHTML = ''; // Очищаем лоадер
+                container.innerHTML = ''; 
 
                 if (games.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #666;">Тут пока пусто...</p>';
                     return;
                 }
 
-                // Проходимся по каждой игре и создаем HTML-код
                 games.forEach((game, index) => {
                     const gameItem = document.createElement('div');
                     gameItem.className = 'game-item';
-                    
-                    // Добавляем небольшую задержку анимации для красивого эффекта появления в шахматном порядке
-                    gameItem.style.animationDelay = `${index * 0.1}s`;
+                    gameItem.style.animationDelay = `${index * 0.08}s`;
 
                     gameItem.innerHTML = `
                         <div class="game-info">
                             <img class="game-icon" src="${game.icon}" alt="${game.name}">
                             <div class="game-name">${game.name}</div>
                         </div>
-                        <a href="${game.filepath}" class="download-btn" download>Установить</a>
+                        <button class="btn" onclick="handleInstall('${game.filepath}')">Установить</button>
                     `;
                     
                     container.appendChild(gameItem);
@@ -244,7 +330,46 @@
             }
         }
 
-        // Запуск при загрузке страницы
+        // Логика нажатия на "Установить"
+        function handleInstall(url) {
+            // Проверяем, сохранял ли пользователь выбор "Больше не показывать"
+            const skipInstruction = localStorage.getItem('skipDreamStoreModal') === 'true';
+
+            if (skipInstruction) {
+                // Если просили не показывать — сразу перенаправляем на гитхаб
+                window.open(url, '_blank');
+            } else {
+                // Иначе открываем модалку и передаем туда ссылку
+                currentGameUrl = url;
+                document.getElementById('modal-go-link').href = url;
+                document.getElementById('instruction-modal').classList.add('active');
+            }
+        }
+
+        // Закрытие модалки при клике на кнопки внутри неё
+        document.getElementById('modal-go-link').addEventListener('click', () => {
+            document.getElementById('instruction-modal').classList.remove('active');
+        });
+
+        document.getElementById('modal-skip-btn').addEventListener('click', () => {
+            // Запоминаем в браузере выбор пользователя
+            localStorage.setItem('skipDreamStoreModal', 'true');
+            document.getElementById('instruction-modal').classList.remove('active');
+            
+            // И после этого сразу перенаправляем по ссылке текущей игры
+            if (currentGameUrl) {
+                window.open(currentGameUrl, '_blank');
+            }
+        });
+
+        // Закрытие окна, если кликнули по фону вокруг него
+        document.getElementById('instruction-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                document.getElementById('instruction-modal').classList.remove('active');
+            }
+        });
+
+        // Старт скрипта
         document.addEventListener('DOMContentLoaded', loadGames);
     </script>
 </body>
