@@ -61,6 +61,8 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             animation: scaleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: block;
+            cursor: pointer; /* Курсор-рука при наведении */
         }
 
         .promo-banner:hover {
@@ -106,7 +108,7 @@
             align-items: center;
             gap: 14px;
             flex: 1;
-            min-width: 0; /* Чтобы длинный текст корректно обрезался */
+            min-width: 0; /* Обрезает длинный текст, чтобы не ломать верстку */
         }
 
         .game-icon {
@@ -133,7 +135,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #4045b2;
+            background: #4045b2; /* Насыщенный фиолетово-синий */
             color: #ffffff;
             text-decoration: none;
             padding: 10px 16px;
@@ -155,7 +157,7 @@
             transform: scale(0.96);
         }
 
-        /* Кнопка "Больше не показывать" (второстепенная) */
+        /* Кнопка "Больше не показывать" */
         .btn-secondary {
             background: #222224;
             color: #aaaaaa;
@@ -167,7 +169,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- Стили Модального Окна (Инструкции) --- */
+        /* --- Стили Модального Окна --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -244,7 +246,7 @@
             margin-top: 6px;
         }
 
-        /* Анимации загрузки */
+        /* Анимации */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -264,9 +266,9 @@
     <div class="store-container">
         <h1 class="store-header">DreamStore</h1>
 
-        <div class="promo-banner">
-            <img src="banner.png" alt="Встречайте DreamStore!">
-        </div>
+        <a href="https://t.me/dream_devteam" target="_blank" class="promo-banner">
+            <img src="banner.png" alt="Встречайте DreamStore! Все приложения команды в одном месте">
+        </a>
 
         <div class="games-list" id="games-container">
             <p style="text-align: center; color: #666; font-size: 14px; padding: 20px;">Загрузка игр...</p>
@@ -279,7 +281,7 @@
             
             <div class="modal-steps">
                 <div class="modal-step">1. Нажмите на кнопку <strong>"Перейти по ссылке"</strong> ниже.</div>
-                <div class="modal-step">2. На открывшейся странице GitHub нажмите кнопку <strong>"Скачать всё"</strong> (или Download).</div>
+                <div class="modal-step">2. На открывшейся странице нажмите кнопку <strong>"Скачать всё"</strong> (или Download).</div>
             </div>
 
             <div class="modal-buttons">
@@ -290,15 +292,15 @@
     </div>
 
     <script>
-        // Переменная для хранения текущей ссылки на билд
         let currentGameUrl = "";
 
+        // Загрузка данных игр из games.json
         async function loadGames() {
             const container = document.getElementById('games-container');
             
             try {
                 const response = await fetch('games.json');
-                if (!response.ok) throw new Error('Ошибка загрузки JSON');
+                if (!response.ok) throw new Error('Ошибка при чтении файла JSON');
                 
                 const games = await response.json();
                 container.innerHTML = ''; 
@@ -311,6 +313,7 @@
                 games.forEach((game, index) => {
                     const gameItem = document.createElement('div');
                     gameItem.className = 'game-item';
+                    // Плавное появление элементов один за другим
                     gameItem.style.animationDelay = `${index * 0.08}s`;
 
                     gameItem.innerHTML = `
@@ -326,50 +329,48 @@
 
             } catch (error) {
                 console.error(error);
-                container.innerHTML = '<p style="text-align: center; color: #ff4a4a; font-size: 14px;">Ошибка загрузки данных.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #ff4a4a; font-size: 14px;">Ошибка загрузки списка игр.</p>';
             }
         }
 
-        // Логика нажатия на "Установить"
+        // Логика кнопки "Установить"
         function handleInstall(url) {
-            // Проверяем, сохранял ли пользователь выбор "Больше не показывать"
             const skipInstruction = localStorage.getItem('skipDreamStoreModal') === 'true';
 
             if (skipInstruction) {
-                // Если просили не показывать — сразу перенаправляем на гитхаб
+                // Если пользователь просил скрыть модалку — сразу переходим по ссылке
                 window.open(url, '_blank');
             } else {
-                // Иначе открываем модалку и передаем туда ссылку
+                // Показываем окно с инструкцией
                 currentGameUrl = url;
                 document.getElementById('modal-go-link').href = url;
                 document.getElementById('instruction-modal').classList.add('active');
             }
         }
 
-        // Закрытие модалки при клике на кнопки внутри неё
+        // Закрытие модалки при переходе по ссылке
         document.getElementById('modal-go-link').addEventListener('click', () => {
             document.getElementById('instruction-modal').classList.remove('active');
         });
 
+        // Кнопка "Больше не показывать"
         document.getElementById('modal-skip-btn').addEventListener('click', () => {
-            // Запоминаем в браузере выбор пользователя
-            localStorage.setItem('skipDreamStoreModal', 'true');
+            localStorage.setItem('skipDreamStoreModal', 'true'); // Запоминаем выбор
             document.getElementById('instruction-modal').classList.remove('active');
             
-            // И после этого сразу перенаправляем по ссылке текущей игры
             if (currentGameUrl) {
                 window.open(currentGameUrl, '_blank');
             }
         });
 
-        // Закрытие окна, если кликнули по фону вокруг него
+        // Закрытие окна при клике на темную область вокруг него
         document.getElementById('instruction-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 document.getElementById('instruction-modal').classList.remove('active');
             }
         });
 
-        // Старт скрипта
+        // Запуск скрипта
         document.addEventListener('DOMContentLoaded', loadGames);
     </script>
 </body>
