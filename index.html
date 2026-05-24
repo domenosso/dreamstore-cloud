@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamStore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Общие стили и сброс */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Контейнер приложения (имитация мобильного экрана как на рефе) */
+        .store-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #0f0f0f;
+            min-height: 840px;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Заголовок стора */
+        .store-header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-top: 8px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        /* Баннер */
+        .promo-banner {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: scaleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .promo-banner:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 28px rgba(81, 74, 197, 0.2);
+        }
+
+        .promo-banner img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Список игр */
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Карточка игры */
+        .game-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #141414;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid #1f1f1f;
+            transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            animation: slideInUp 0.5s ease both;
+        }
+
+        .game-item:hover {
+            transform: translateY(-2px);
+            background-color: #1a1a1a;
+            border-color: #2a2a2a;
+        }
+
+        /* Левая часть карточки (Иконка + Название) */
+        .game-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .game-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            object-fit: cover;
+            background-color: #2a2a2a; /* Фолбек, если иконка не загрузится */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            max-width: 160px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Кнопка "Установить" */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #4045b2; /* Насыщенный сине-фиолетовый цвет с рефа */
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #4f55d6;
+            box-shadow: 0 4px 12px rgba(79, 85, 214, 0.3);
+        }
+
+        .download-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Анимации */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="store-container">
+        <h1 class="store-header">DreamStore</h1>
+
+        <div class="promo-banner">
+            <img src="banner.png" alt="Встречайте DreamStore! Все приложения команды в одном месте">
+        </div>
+
+        <div class="games-list" id="games-container">
+            <p style="text-align: center; color: #666; font-size: 14px; padding: 20px;">Загрузка игр...</p>
+        </div>
+    </div>
+
+    <script>
+        // Функция для загрузки данных из games.json
+        async function loadGames() {
+            const container = document.getElementById('games-container');
+            
+            try {
+                const response = await fetch('games.json');
+                if (!response.ok) {
+                    throw new Error('Не удалось загрузить список игр');
+                }
+                
+                const games = await response.json();
+                container.innerHTML = ''; // Очищаем лоадер
+
+                if (games.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">Тут пока пусто...</p>';
+                    return;
+                }
+
+                // Проходимся по каждой игре и создаем HTML-код
+                games.forEach((game, index) => {
+                    const gameItem = document.createElement('div');
+                    gameItem.className = 'game-item';
+                    
+                    // Добавляем небольшую задержку анимации для красивого эффекта появления в шахматном порядке
+                    gameItem.style.animationDelay = `${index * 0.1}s`;
+
+                    gameItem.innerHTML = `
+                        <div class="game-info">
+                            <img class="game-icon" src="${game.icon}" alt="${game.name}">
+                            <div class="game-name">${game.name}</div>
+                        </div>
+                        <a href="${game.filepath}" class="download-btn" download>Установить</a>
+                    `;
+                    
+                    container.appendChild(gameItem);
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<p style="text-align: center; color: #ff4a4a; font-size: 14px;">Ошибка загрузки данных.</p>';
+            }
+        }
+
+        // Запуск при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadGames);
+    </script>
+</body>
+</html>
